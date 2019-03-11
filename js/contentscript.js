@@ -21,7 +21,11 @@
 		decliningIcon: browser.runtime.getURL('../css/images/TrendDecliningIcon.png')
 	};
 
-	start();
+	if(document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded',start);
+	} else {
+		start()
+	}
 
 	function start() {
 		const body = document.getElementsByTagName('body')[0];
