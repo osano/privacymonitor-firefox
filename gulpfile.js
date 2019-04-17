@@ -29,6 +29,11 @@ gulp.task('copyIcons', function() {
 		.pipe(gulp.dest(distDir + 'icons'));
 });
 
+gulp.task('copyOptions', function() {
+	return gulp.src('options.html')
+		.pipe(gulp.dest(distDir));
+});
+
 gulp.task('copyManifest', function() {
 	return gulp.src(distDir + 'manifest.json')
 		.pipe(gulp.dest('./'));
@@ -50,5 +55,5 @@ gulp.task('clean', function () {
 });
 
 gulp.task('default', function(){
-	return sequence('build', 'copyImages', 'copyIcons', 'copyManifest', 'zip', 'clean');
+	return sequence('build', 'copyImages', 'copyIcons', 'copyOptions', 'copyManifest', 'zip', 'clean');
 });

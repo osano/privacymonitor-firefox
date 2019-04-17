@@ -23,8 +23,8 @@
 		decliningIcon: browser.runtime.getURL('../css/images/TrendDecliningIcon.png')
 	};
 
-	if(document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded',start);
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', start);
 	} else {
 		start()
 	}
@@ -66,45 +66,73 @@
 		elChild.classList.add(GUID);
 		body.appendChild(elChild);
 
-		// set initial message
-		browser.runtime.sendMessage({msg: 'getPrivacyScore'});
+		try {
+			// set initial message
+			browser.runtime.sendMessage({
+				msg: 'getPrivacyScore'
+			});
+		} catch (err) {}
 
 		const modal = document.getElementsByClassName(GUID)[0];
 		const closeBtn = document.getElementsByClassName('ct-' + GUID)[0];
 		let displayModalTimeout;
 
-		closeBtn.onclick = function() {
+		let fadeModal = function (){
+			modal.classList.add('pmh-' + GUID);
+			setTimeout(function () {
+				modal.classList.remove('pmh-' + GUID);
+				modal.style.display = 'none';
+			}, 1000);
+		}
+
+		closeBtn.onclick = function () {
 			modal.style.display = 'none';
 			clearTimeout(displayModalTimeout);
 		};
 
+		/* if they mouse over the popup then don't auto fade out */
+		modal.addEventListener("mouseenter", function (event) {
+			clearTimeout(displayModalTimeout);
+		});
+		
+		modal.addEventListener("mouseleave", function (event) {
+			fadeModal();
+		});
+
 		const sendBtn = document.getElementById('tbsend-' + GUID);
-		sendBtn.onclick = function() {
+		sendBtn.onclick = function () {
 			const requestDiv = document.getElementById('padded-' + GUID);
 			requestDiv.innerHTML = '<div>Your request has been received. Please allow up to 10 business days for this site to be reviewed.</div>';
 			sendBtn.style.display = 'none';
 
-			chrome.runtime.sendMessage({msg: 'requestReview'});
+			chrome.runtime.sendMessage({
+				msg: 'requestReview'
+			});
 		};
 
 		// message listener
-		browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-			switch(request.message) {
+		browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+			switch (request.message) {
 				case 'NotFound':
 					setDisplayDomainNotFound(request);
 					setLoading(false);
 					break;
 				case 'ActiveTabScore':
-					modal.style.display = 'block';
-					displayModalTimeout = setTimeout(function () {
-						modal.classList.add('pmh-' + GUID);
-						setTimeout(function () {
-							modal.classList.remove('pmh-' + GUID);
-							modal.style.display = 'none';
-						}, 1000);
-
-					}, 1000 * 8);
-
+					let items = browser.storage.sync.get();
+					items.then(function (items) {
+						if (typeof (items.autoOption) == "undefined" || typeof (items.screenTime) == "undefined") {
+							items = {
+								autoOption: "auto",
+								screenTime: "6"
+							};
+						}
+						if (items.autoOption == 'auto') {
+							modal.style.display = 'block';
+							displayModalTimeout = setTimeout(function () {
+								fadeModal();
+							}, 1000 * parseInt(items.screenTime));
+						}
+					});
 					setDisplayDomainScore(request);
 					setLoading(false);
 					break;
@@ -122,9 +150,8 @@
 	}
 
 	function setLoading(isLoading) {
-		let tcci =  document.getElementById('tcci-' + GUID);
-		if (typeof(tcci) != 'undefined' && tcci != null)
-		{
+		let tcci = document.getElementById('tcci-' + GUID);
+		if (typeof (tcci) != 'undefined' && tcci != null) {
 			document.getElementById('tcci-' + GUID).style.display = isLoading ? 'block' : 'none';
 		}
 	}
@@ -211,7 +238,7 @@
 					trendClass = `gtt-increased-${GUID}`;
 					trendText = `${scoreText.scoreIncreased}`;
 					createScoreCicle(score, icons.improvingIcon, status, previousScore);
-				}else if (score < previousScore) {
+				} else if (score < previousScore) {
 					trendClass = `gtt-decreased-${GUID}`;
 					trendText = `${scoreText.scoreDecreased}`;
 					createScoreCicle(score, icons.decliningIcon, status, previousScore);
@@ -219,12 +246,12 @@
 			} else {
 				trendClass = `gtt-nochange-${GUID}`;
 				trendText = `${scoreText.scoreNoHistory}`;
-				createScoreCicle(score, icons.noChangeIcon, status,false);
+				createScoreCicle(score, icons.noChangeIcon, status, false);
 			}
 		} else if (previousScore === 0) {
 			trendClass = `gtt-nochange-${GUID}`;
 			trendText = `${scoreText.scoreNoHistory}`;
-			createScoreCicle(score, icons.noChangeIcon, status,false);
+			createScoreCicle(score, icons.noChangeIcon, status, false);
 		} else if (score > previousScore) {
 			trendClass = `gtt-increased-${GUID}`;
 			trendText = `${scoreText.scoreIncreased}`;
