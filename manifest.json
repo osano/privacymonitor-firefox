@@ -1,7 +1,7 @@
 {
 	"name": "Privacy Monitor by Osano",
 	"description": "We read the fine print, so you don't have to. Knowing who to trust with your private personal data can be confusing. With Privacy Monitor by Osano, it's easy! Surf the web using our secure, private, web browser to receive real-time trust score alerts or access privacy ratings through the share button of your favorite web browser and apps. It's like anti-virus for data privacy.",
-	"version": "1.0.20",
+	"version": "1.0.21",
 	"author": "Osano, Inc., A Public Benefit Corporation",
 	"applications": {
 		"gecko": {
