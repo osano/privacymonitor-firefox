@@ -41,6 +41,6 @@ source code.
 [logo]: Contrib/logo.png
 [osano]: https://www.osano.com
 [li]: https://img.shields.io/badge/license-MIT-brightgreen.svg
-[ll]: LICENSE
+[ll]: LICENSE.md
 [pi]: https://img.shields.io/badge/platform-Firefox-lightgrey.svg
 [pl]: https://addons.mozilla.org/en-US/developers/
